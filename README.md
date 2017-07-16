@@ -1,5 +1,6 @@
 # Waagent_Reload
-##These scripts are to reload waagent from various Linux distros. 
+
+## These scripts are to reload waagent from various Linux distros. 
 
 More importantly, these scripts automate the removal and re-installation of the Waagent from the VM.   The scripts are built for the four common variations of Linux in Azure.
 They need to be run as superuser and there are no extra flags (at this time).
