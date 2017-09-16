@@ -9,50 +9,43 @@
 #
 # Richard Eeske
 # July 15th 2017
-
+#
+# 1.0 Inital release
+# 1.1 Clean up and tuning : added logger
+#
 # Test for root or sudo
 if [[ "$(id -u)" -ne "$ROOTUID" ]] ; then
-        logger -s "This script must be executed with super-user privileges."
-        exit 1
+	echo "Waagent reload : This script must be executed with super-user privileges." | tee /dev/tty | logger -s
+	exit 1
 fi
 
 # Check for systemctl
 if [ ! -e /sbin/service ]; then
-        logger -s"Wrong OS verion, missing service utility."
-        exit 2
+	echo "Waagent reload : Wrong OS verion, missing service." | tee /dev/tty | logger -s
+	exit 2
 fi
-
 sudo service waagent stop
-echo "Please wait."
-sleep 1
-
+	sleep 1
 # Remove the waagent (force if needed)
 yum remove WALinuxAgent.noarch -y
-logger "** Wait for completion. **"
-sleep 5
-
+	sleep 5
 # Double check to see if the binary is gone.
 if [ -e /usr/sbin/waagent ]; then
-        rm /usr/sbin/waagent*
-        logger "Waagent found: Removing waagent binary"
+	rm /usr/sbin/waagent*
+	echo "Waagent reload : Waagent found: Removing waagent binary" | tee /dev/tty | logger -s
 fi
-
 # Now, install the waagent
 yum install WALinuxAgent.noarch -y
-logger "** Wait for completion. **"
-sleep 5
-
+	sleep 5
 # Lastly verify that the waagent is active
 service waagent start
-logger $(service waagent status | grep running)
-sleep 1
-
+echo $(service waagent status | grep running) | tee /dev/tty | logger 
+	sleep 1
 # When the agent is up and running then enable it to start on boot.
 # Make sure waagent is on.
-logger $(chkconfig waagent on)
-
-# Verify that the waagent is enabled for the needed runlevels
-logger $(chkconfig | grep waagent)
-Version=$(waagent -version | grep Agent | cut -c1-19)
-logger "$Version installed"
-echo "Reinstall Script Complete."
+chkconfig waagent on
+echo $(chkconfig | grep waagen) | tee /dev/tty | logger 
+# Show waagent version
+Version=$(waagent -version | grep -i agent | cut -c1-19)
+echo "$Version installed"  | tee /dev/tty | logger 
+#End
